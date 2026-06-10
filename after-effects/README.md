@@ -17,6 +17,13 @@ The AI does the hard part (depth estimation from a single image/video); the AE r
 | `Depth Scanner.jsx` | The AE panel: renders frames, runs the model, imports depth, applies the rig |
 | `depth_estimate.py` | Local AI backend — Depth-Anything V2 (PyTorch + transformers) |
 | `requirements.txt` | Python dependencies |
+| `install.ps1` | One-shot Windows installer (pip install + copy into AE) |
+
+**Windows quick install:** after cloning, run
+```powershell
+powershell -ExecutionPolicy Bypass -File .\after-effects\install.ps1
+```
+It installs the Python deps, finds your newest After Effects, copies the panel into `ScriptUI Panels`, and prints the Python path to paste into the panel. Then do the manual steps it lists (restart AE, enable scripting access).
 
 ## Setup (one time)
 
