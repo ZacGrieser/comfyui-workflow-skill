@@ -40,6 +40,7 @@
     var SCRIPT_NAME = "Depth Scanner";
     var SETTINGS = "DepthScanner";
     var IS_WIN = ($.os.indexOf("Windows") !== -1);
+    var OPT_DOTS = false; // "point-cloud dots" mode (set by the UI checkbox)
 
     // --- settings persistence -------------------------------------------
 
@@ -103,6 +104,18 @@
         edge.name = "DS Scan · Contour";
         trySet(edge.property("ADBE Find Edges-0001"), 1);
 
+        // Optional: turn the scan line into a grid of balls (point cloud).
+        if (OPT_DOTS) {
+            try {
+                var ball = fx.addProperty("CC Ball Action");
+                ball.name = "DS Scan · Point Cloud";
+                tryExpr(ball.property("Grid Spacing"),
+                    'thisComp.layer("' + sceneName + '").effect("DS · Dot Grid")("Slider");');
+                tryExpr(ball.property("Ball Size"),
+                    'thisComp.layer("' + sceneName + '").effect("DS · Dot Grid")("Slider") * 0.9;');
+            } catch (e) {}
+        }
+
         var glow = fx.addProperty("ADBE Glo2");
         glow.name = "DS Scan · Glow";
         tryExpr(glow.property("Glow Radius"),
@@ -119,6 +132,27 @@
         tryExpr(scan.property("ADBE Transform Group").property("ADBE Opacity"),
             'thisComp.layer("' + sceneName + '").effect("DS · Scan Glow")("Slider");');
         return scan;
+    }
+
+    // Atmospheric depth fog: an inverted depth duplicate tinted to the fog
+    // color, in Add blend, so far areas fade toward fog and near areas don't.
+    function buildFog(depthLayer, sceneName) {
+        var fog = depthLayer.duplicate();
+        fog.moveToBeginning();
+        fog.name = "DS · Fog";
+        try { fog.blendingMode = BlendingMode.ADD; } catch (e) {}
+        var fx = fog.property("ADBE Effect Parade");
+
+        fx.addProperty("ADBE Invert").name = "DS Fog · Far = bright"; // near→black, far→white
+
+        var tint = fx.addProperty("ADBE Tint");
+        tint.name = "DS Fog · Color";
+        tryExpr(tint.property("ADBE Tint-0002"), // Map White To
+            'thisComp.layer("' + sceneName + '").effect("DS · Fog Color")("Color");');
+
+        tryExpr(fog.property("ADBE Transform Group").property("ADBE Opacity"),
+            'thisComp.layer("' + sceneName + '").effect("DS · Fog Density")("Slider");');
+        return fog;
     }
 
     function applyRig(sceneLayer, depthLayer) {
@@ -144,6 +178,12 @@
             trySet(scanColor.property("ADBE Color Control-0001"), [0, 1, 0.65, 1]);
             var scanGlow = addControl(sceneLayer, "ADBE Slider Control", "DS · Scan Glow");
             trySet(scanGlow.property("ADBE Slider Control-0001"), 100);
+            var dotGrid = addControl(sceneLayer, "ADBE Slider Control", "DS · Dot Grid");
+            trySet(dotGrid.property("ADBE Slider Control-0001"), 12);
+            var fogColor = addControl(sceneLayer, "ADBE Color Control", "DS · Fog Color");
+            trySet(fogColor.property("ADBE Color Control-0001"), [0.55, 0.65, 0.8, 1]);
+            var fogDensity = addControl(sceneLayer, "ADBE Slider Control", "DS · Fog Density");
+            trySet(fogDensity.property("ADBE Slider Control-0001"), 0); // off by default
 
             var cblur = addControl(sceneLayer, "ADBE Compound Blur", "DS Render · Depth of Field");
             trySet(cblur.property("ADBE Compound Blur-0001"), depthLayer.index);
@@ -154,6 +194,7 @@
             var blendProp = cma.property("ADBE Colorama-0024") || cma.property("Blend With Original");
             tryExpr(blendProp, '100 - effect("DS · Color Map")("Slider");');
 
+            buildFog(depthLayer, sceneName);
             buildScanFront(depthLayer, sceneName);
 
             if (depthLayer !== sceneLayer) {
@@ -382,6 +423,17 @@
         aiFrame.onClick = function () { runAI(false); };
         var aiRange = ai.add("button", undefined, "Estimate Depth (work area)");
         aiRange.onClick = function () { runAI(true); };
+
+        // --- Look options (apply to both AI and Manual) ---
+        OPT_DOTS = (getPref("dots", "0") === "1");
+        var look = root.add("panel", undefined, "Look");
+        look.orientation = "column";
+        look.alignChildren = ["left", "top"];
+        look.margins = 10; look.spacing = 4;
+        var dotsCb = look.add("checkbox", undefined, "Point-cloud dots (scan front)");
+        dotsCb.value = OPT_DOTS;
+        dotsCb.onClick = function () { OPT_DOTS = dotsCb.value; setPref("dots", OPT_DOTS ? "1" : "0"); };
+        look.add("statictext", undefined, "Fog: set DS · Fog Density > 0 after applying.");
 
         // --- Manual panel ---
         var man = root.add("panel", undefined, "Manual (have a depth map)");

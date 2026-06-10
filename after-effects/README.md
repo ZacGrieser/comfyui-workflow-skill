@@ -61,6 +61,13 @@ One tidy **Effect Controls** group of `DS ·` controls:
 | `DS · Scan Width` | Box Blur / Glow | Thickness / softness of the scan line |
 | `DS · Scan Color` | Tint | Color of the glowing scan front |
 | `DS · Scan Glow` | Glow / Opacity | Brightness of the sweeping contour |
+| `DS · Dot Grid` | CC Ball Action | Grid spacing of the point-cloud dots (when enabled) |
+| `DS · Fog Color` | Tint | Color of the atmospheric depth fog |
+| `DS · Fog Density` | Opacity | Distance fog strength (0 = off) |
+
+**Depth fog** — a `DS · Fog` layer fades far areas toward the fog color (inverted depth tinted in Add blend). Off by default; raise `DS · Fog Density` to dial it in.
+
+**Point-cloud dots** — tick **Look ▸ Point-cloud dots** *before* applying to turn the sweeping scan front into a grid of glowing balls (LIDAR point-cloud plane); `DS · Dot Grid` sets the spacing.
 
 ## Export a real `.ffx` preset
 
@@ -95,7 +102,8 @@ This is the After Effects companion to the ComfyUI workflow skill. Same depth mo
 
 - **Depth convention:** brighter = nearer (Depth-Anything outputs inverse depth), matching the rig. Use `--invert` (CLI) or add an **Invert** effect if you need it flipped.
 - **Compound Blur's Blur Layer is a fixed layer pick** (AE won't let an expression choose a layer source). It's wired to the depth map at apply time; if you change the `DS · Depth Map` control later, also update the *Depth of Field* effect's **Blur Layer** dropdown.
-- The scan front is a duplicate of the depth map (`Threshold → Box Blur → Find Edges → Glow → Tint`, **Add** blend). Delete the `DS · Scan Front` layer to remove just the scan.
+- The scan front is a duplicate of the depth map (`Threshold → Box Blur → Find Edges → Glow → Tint`, **Add** blend). Delete the `DS · Scan Front` layer to remove just the scan; delete `DS · Fog` to remove fog.
+- **Point-cloud dots** use **CC Ball Action**, which ships with After Effects but not all OEM/trial builds — if it's missing the scan front still works as a solid line.
 - Verified against documented AE effect match-names + Python syntax-checked; the AI step needs a working local Python/torch env, and minor per-version tuning inside AE is expected for any preset.
 
 ## License
