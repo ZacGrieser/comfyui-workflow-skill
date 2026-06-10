@@ -1,69 +1,102 @@
-# Depth Scanner — for After Effects
+# Depth Scanner — AI plug-in for After Effects
 
-> Recreate the [aescripts **Depth Scanner**](https://aescripts.com/depth-scanner/) look inside After Effects, driven by a grayscale **depth map** — the kind a ComfyUI ControlNet depth preprocessor (Depth‑Anything / MiDaS / ZoeDepth) produces.
+> An **AI Depth Scanner**: estimates a depth map from your footage with **Depth-Anything V2** (run locally), imports it back into After Effects, and applies a native-effect scanner rig — recreating the [aescripts **Depth Scanner**](https://aescripts.com/depth-scanner/) workflow end to end, free and offline.
 
-The commercial Depth Scanner plug-in does two jobs: (1) **AI depth estimation** from footage, and (2) a **toolkit** that uses that depth for color maps, depth slicing, fog, and depth‑of‑field. This package covers job #2 with **native AE effects** and lets the AI step happen upstream in ComfyUI (this repo) — so the two halves of the pipeline fit together.
+```
+[AE footage] --render frames--> [Python: Depth-Anything V2]
+     --> [grayscale depth PNGs] --import--> [AE]
+     --> Depth-of-Field + Color Map + sweeping Scan Front
+```
 
-## What it does
+The AI does the hard part (depth estimation from a single image/video); the AE rig turns that depth into the look: depth-of-field, color maps, and a glowing scan front that sweeps near→far.
 
-Applied to a depth map (and optional footage), it builds one tidy **Effect Controls rig**:
+## Contents
+
+| File | Role |
+|---|---|
+| `Depth Scanner.jsx` | The AE panel: renders frames, runs the model, imports depth, applies the rig |
+| `depth_estimate.py` | Local AI backend — Depth-Anything V2 (PyTorch + transformers) |
+| `requirements.txt` | Python dependencies |
+
+## Setup (one time)
+
+1. **Install the Python backend** (next to the script):
+   ```bash
+   cd after-effects
+   pip install -r requirements.txt
+   ```
+   First run auto-downloads the model from Hugging Face. For GPU, install the matching [PyTorch build](https://pytorch.org) first (CUDA / Apple MPS both supported; CPU works too, just slower).
+
+2. **Install the panel:** copy `Depth Scanner.jsx` into AE's `Scripts/ScriptUI Panels/` folder, then restart AE and open it from the **Window** menu. (Or just `File ▸ Scripts ▸ Run Script File…` each time.)
+
+3. **Enable scripting access:** `Preferences ▸ Scripting & Expressions ▸ Allow Scripts to Write Files and Access Network` → **ON** (needed to render frames and call Python).
+
+4. **Set the Python path** in the panel if `python3` isn't on PATH. GUI-launched AE often can't see your shell PATH, so use the **full path to your venv's python** (e.g. `/path/to/venv/bin/python`, or `…\venv\Scripts\python.exe` on Windows). The `…` button lets you browse to it. The choice is remembered.
+
+## Use it
+
+### AI mode (estimate depth automatically)
+1. Select your **footage** layer in a comp.
+2. Pick a model: **vits** (fast) / **vitb** (balanced) / **vitl** (best).
+3. Click:
+   - **Estimate Depth (current frame)** — single still, per-frame normalization.
+   - **Estimate Depth (work area)** — the work-area range as a sequence, **globally normalized** for flicker-free video.
+4. The panel solos & renders the layer, runs Depth-Anything, imports the depth map(s) as `<layer> depth`, and applies the rig. Animate `DS · Scan Position` to sweep the scanner.
+
+> AE's UI is frozen while the model runs (a blocking call). A still on CPU is seconds; a long range on CPU can take minutes — use a GPU build of torch for video.
+
+### Manual mode (you already have a depth map)
+Have a depth map from a **ComfyUI ControlNet depth** preprocessor (or anywhere)? Select **footage + depth map** (depth auto-detected by name), click **Apply to selection**. One selected layer = treat it as the depth map itself.
+
+## The rig
+
+One tidy **Effect Controls** group of `DS ·` controls:
 
 | Control | Effect | Result |
 |---|---|---|
 | `DS · Depth Map` | Layer pick | Which layer is the depth source |
-| `DS · DoF Amount` | Compound Blur | Depth‑based shallow depth‑of‑field |
+| `DS · DoF Amount` | Compound Blur | Depth-based shallow depth-of-field |
 | `DS · Color Map` | Colorama | Colorful depth visualization (0 = off, 100 = full) |
-| `DS · Scan Position` | Threshold sweep | Depth at which the scan plane sits |
+| `DS · Scan Position` | Threshold sweep | Depth the scan plane sits at — **animate this** |
 | `DS · Scan Width` | Box Blur / Glow | Thickness / softness of the scan line |
 | `DS · Scan Color` | Tint | Color of the glowing scan front |
 | `DS · Scan Glow` | Glow / Opacity | Brightness of the sweeping contour |
 
-The headline look is the **Scan Front**: a glowing contour line that sweeps *through depth* as you animate `DS · Scan Position` 0 → 100 — a LIDAR/scanner wavefront moving from near to far.
+## Export a real `.ffx` preset
 
-## Why a `.jsx` and not a ready-made `.ffx`
-
-An `.ffx` animation preset is a **binary file that only After Effects itself can write** (`Animation ▸ Save Animation Preset…`). It can't be hand-authored reliably outside AE. This script is the **engine** that builds the exact effect+expression stack the preset would contain — then you export the real `.ffx` in one click (see below).
-
-## Install & use
-
-**Run as a script (simplest):**
-1. After Effects ▸ `File ▸ Scripts ▸ Run Script File…` → pick `Depth Scanner.jsx`.
-
-**Install as a dockable panel:**
-1. Copy `Depth Scanner.jsx` into your AE `Scripts/ScriptUI Panels/` folder.
-   - Windows: `C:\Program Files\Adobe\Adobe After Effects <ver>\Support Files\Scripts\ScriptUI Panels\`
-   - macOS: `/Applications/Adobe After Effects <ver>/Scripts/ScriptUI Panels/`
-2. Enable `Preferences ▸ Scripting & Expressions ▸ Allow Scripts to Write Files and Access Network`.
-3. Restart AE → open it from the **Window** menu.
-
-**Then:**
-1. In a comp, select your layer(s):
-   - **1 layer** → the depth map itself (color‑map + scan view)
-   - **2 layers** → footage **+** its depth map (DoF + scan). The depth map is auto‑detected by name (`depth`, `midas`, `zoe`, `mask`…); if it can't be guessed, you'll be asked which is which.
-2. Click **Apply Depth Scanner**.
-3. Animate `DS · Scan Position` to sweep the scan; tune the other `DS ·` sliders to taste.
-
-## Export the real `.ffx` preset
+A `.ffx` animation preset is a **binary file only After Effects can write**, so the script builds the effect/expression stack and you export it in one click:
 
 1. Apply Depth Scanner to a layer.
-2. In **Effect Controls**, select all the `DS …` effects (click the first, shift‑click the last).
+2. In **Effect Controls**, select all the `DS …` effects (click first, shift-click last).
 3. `Animation ▸ Save Animation Preset…` → save as **`Depth Scanner.ffx`**.
-4. Drag that `.ffx` onto any layer to reuse it. (The panel's **How to export .ffx** button repeats these steps.)
+4. Drag that `.ffx` onto any layer to reuse the look. (The **How to export .ffx** button repeats this.)
 
-## ComfyUI → After Effects pipeline
+> The `.ffx` carries the effect rig, not the AI step — keep using the panel to generate fresh depth maps.
 
-This package is the AE end of a depth pipeline that starts in this repo:
+## Standalone backend
 
-1. **ComfyUI** — run a ControlNet **depth** preprocessor (e.g. Depth‑Anything / MiDaS) on your image or video frames to render a grayscale **depth map** (white = near, black = far, or invert as needed). Ask this skill, e.g. *"SDXL + ControlNet depth workflow"*.
-2. Export the depth map as a PNG sequence / image alongside your footage.
-3. **After Effects** — import footage + depth map, select both, and **Apply Depth Scanner**.
+`depth_estimate.py` works on its own too:
+```bash
+# single image
+python depth_estimate.py -i frame.png -o out/ --encoder vitl
+
+# a folder of frames, temporally stabilized (flicker-free)
+python depth_estimate.py -i frames/ -o out/ --encoder vitb --normalize global
+
+# far = bright instead of near = bright
+python depth_estimate.py -i frame.png -o out/ --invert
+```
+
+## How this fits the repo
+
+This is the After Effects companion to the ComfyUI workflow skill. Same depth model family that ComfyUI's Depth-Anything ControlNet preprocessor uses — so you can generate depth either in ComfyUI (as part of an image/video workflow) or right here in AE.
 
 ## Notes & limitations
 
-- **Compound Blur's Blur Layer is a fixed layer pick** (AE doesn't let expressions choose a layer source). The script wires it to your depth map at apply time. If you later change the `DS · Depth Map` control, also update the *Depth of Field* effect's **Blur Layer** dropdown to match.
-- The scan front is built from `Threshold → Box Blur → Find Edges → Glow → Tint` on a duplicate of the depth map (set to **Add** blend). Delete that `DS · Scan Front` layer to remove just the scan.
-- Depth map convention: brighter = nearer. If your map is inverted, add an **Invert** effect to it (or flip `Scan Position`).
-- Built and verified against the documented AE effect match‑names; minor per‑version tuning inside AE is expected for any preset.
+- **Depth convention:** brighter = nearer (Depth-Anything outputs inverse depth), matching the rig. Use `--invert` (CLI) or add an **Invert** effect if you need it flipped.
+- **Compound Blur's Blur Layer is a fixed layer pick** (AE won't let an expression choose a layer source). It's wired to the depth map at apply time; if you change the `DS · Depth Map` control later, also update the *Depth of Field* effect's **Blur Layer** dropdown.
+- The scan front is a duplicate of the depth map (`Threshold → Box Blur → Find Edges → Glow → Tint`, **Add** blend). Delete the `DS · Scan Front` layer to remove just the scan.
+- Verified against documented AE effect match-names + Python syntax-checked; the AI step needs a working local Python/torch env, and minor per-version tuning inside AE is expected for any preset.
 
 ## License
 

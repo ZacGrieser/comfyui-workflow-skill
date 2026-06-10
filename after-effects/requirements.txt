@@ -1,0 +1,8 @@
+# Depth Scanner — AI depth backend (Depth-Anything V2)
+# Install:  pip install -r requirements.txt
+# For CUDA, install the matching torch build from https://pytorch.org first.
+torch>=2.1
+torchvision>=0.16
+transformers>=4.45
+pillow>=10.0
+numpy>=1.24
