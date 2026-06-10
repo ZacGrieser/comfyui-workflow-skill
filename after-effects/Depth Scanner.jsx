@@ -71,8 +71,11 @@
         fx.name = name;
         return fx;
     }
-    function trySet(prop, value) { try { prop.setValue(value); } catch (e) {} }
-    function tryExpr(prop, expr) { try { prop.expression = expr; } catch (e) {} }
+    function trySet(prop, value) { try { if (prop) prop.setValue(value); } catch (e) {} }
+    function tryExpr(prop, expr) { try { if (prop) prop.expression = expr; } catch (e) {} }
+    // Safe property lookup: AE THROWS on an unknown match/display name, which
+    // would abort the whole rig. P() swallows that and returns null instead.
+    function P(group, name) { try { return group.property(name); } catch (e) { return null; } }
     function looksLikeDepth(layer) {
         return /depth|disp|midas|zoe|mask|gray|grey/i.test(layer.name);
     }
@@ -89,48 +92,46 @@
         try { scan.blendingMode = BlendingMode.ADD; } catch (e) {}
         var fx = scan.property("ADBE Effect Parade");
 
+        var L = 'thisComp.layer("' + sceneName + '")';
+
         var thr = fx.addProperty("ADBE Threshold2");
         thr.name = "DS Scan · Threshold";
-        tryExpr(thr.property("Level"),
-            'var L = thisComp.layer("' + sceneName + '").effect("DS · Scan Position")("Slider");' +
+        tryExpr(P(thr, "Level"),
+            'var L = ' + L + '.effect("DS · Scan Position")("Slider");' +
             '\nclamp(L,0,100) * 2.55;');
 
         var box = fx.addProperty("ADBE Box Blur2");
         box.name = "DS Scan · Width";
-        tryExpr(box.property("ADBE Box Blur2-0001"),
-            'thisComp.layer("' + sceneName + '").effect("DS · Scan Width")("Slider");');
+        tryExpr(P(box, "ADBE Box Blur2-0001") || P(box, "Blur Radius"),
+            L + '.effect("DS · Scan Width")("Slider");');
 
         var edge = fx.addProperty("ADBE Find Edges");
         edge.name = "DS Scan · Contour";
-        trySet(edge.property("ADBE Find Edges-0001"), 1);
+        trySet(P(edge, "ADBE Find Edges-0001") || P(edge, "Invert"), 1);
 
         // Optional: turn the scan line into a grid of balls (point cloud).
         if (OPT_DOTS) {
             try {
                 var ball = fx.addProperty("CC Ball Action");
                 ball.name = "DS Scan · Point Cloud";
-                tryExpr(ball.property("Grid Spacing"),
-                    'thisComp.layer("' + sceneName + '").effect("DS · Dot Grid")("Slider");');
-                tryExpr(ball.property("Ball Size"),
-                    'thisComp.layer("' + sceneName + '").effect("DS · Dot Grid")("Slider") * 0.9;');
+                tryExpr(P(ball, "Grid Spacing"), L + '.effect("DS · Dot Grid")("Slider");');
+                tryExpr(P(ball, "Ball Size"), L + '.effect("DS · Dot Grid")("Slider") * 0.9;');
             } catch (e) {}
         }
 
         var glow = fx.addProperty("ADBE Glo2");
         glow.name = "DS Scan · Glow";
-        tryExpr(glow.property("Glow Radius"),
-            'var w = thisComp.layer("' + sceneName + '").effect("DS · Scan Width")("Slider");' +
-            '\n10 + w * 2;');
-        tryExpr(glow.property("Glow Intensity"),
-            'thisComp.layer("' + sceneName + '").effect("DS · Scan Glow")("Slider") / 25;');
+        tryExpr(P(glow, "Glow Radius"),
+            'var w = ' + L + '.effect("DS · Scan Width")("Slider");\n10 + w * 2;');
+        tryExpr(P(glow, "Glow Intensity"), L + '.effect("DS · Scan Glow")("Slider") / 25;');
 
         var tint = fx.addProperty("ADBE Tint");
         tint.name = "DS Scan · Color";
-        tryExpr(tint.property("ADBE Tint-0002"),
-            'thisComp.layer("' + sceneName + '").effect("DS · Scan Color")("Color");');
+        tryExpr(P(tint, "ADBE Tint-0002") || P(tint, "Map White To"),
+            L + '.effect("DS · Scan Color")("Color");');
 
-        tryExpr(scan.property("ADBE Transform Group").property("ADBE Opacity"),
-            'thisComp.layer("' + sceneName + '").effect("DS · Scan Glow")("Slider");');
+        tryExpr(P(P(scan, "ADBE Transform Group"), "ADBE Opacity"),
+            L + '.effect("DS · Scan Glow")("Slider");');
         return scan;
     }
 
@@ -147,10 +148,10 @@
 
         var tint = fx.addProperty("ADBE Tint");
         tint.name = "DS Fog · Color";
-        tryExpr(tint.property("ADBE Tint-0002"), // Map White To
+        tryExpr(P(tint, "ADBE Tint-0002") || P(tint, "Map White To"), // Map White To
             'thisComp.layer("' + sceneName + '").effect("DS · Fog Color")("Color");');
 
-        tryExpr(fog.property("ADBE Transform Group").property("ADBE Opacity"),
+        tryExpr(P(P(fog, "ADBE Transform Group"), "ADBE Opacity"),
             'thisComp.layer("' + sceneName + '").effect("DS · Fog Density")("Slider");');
         return fog;
     }
@@ -199,11 +200,14 @@
             trySet(cblur.property("ADBE Compound Blur-0004"), true);
 
             var cma = addControl(sceneLayer, "ADBE Colorama", "DS Render · Color Map");
-            var blendProp = cma.property("ADBE Colorama-0024") || cma.property("Blend With Original");
-            tryExpr(blendProp, '100 - effect("DS · Color Map")("Slider");');
+            // "Blend With Original" is the last Colorama param; look it up by
+            // display name (P() guards versions where the name/index differs).
+            tryExpr(P(cma, "Blend With Original"), '100 - effect("DS · Color Map")("Slider");');
 
-            buildFog(depthLayer, sceneName);
-            buildScanFront(depthLayer, sceneName);
+            // Each builder is isolated: a failure in one must never stop the
+            // other, and must never prevent the headline scan from appearing.
+            try { buildFog(depthLayer, sceneName); } catch (e1) {}
+            try { buildScanFront(depthLayer, sceneName); } catch (e2) {}
 
             if (depthLayer !== sceneLayer) {
                 try { depthLayer.enabled = false; } catch (e) {}
