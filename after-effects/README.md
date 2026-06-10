@@ -41,7 +41,7 @@ The AI does the hard part (depth estimation from a single image/video); the AE r
 3. Click:
    - **Estimate Depth (current frame)** — single still, per-frame normalization.
    - **Estimate Depth (work area)** — the work-area range as a sequence, **globally normalized** for flicker-free video.
-4. The panel solos & renders the layer, runs Depth-Anything, imports the depth map(s) as `<layer> depth`, and applies the rig. Animate `DS · Scan Position` to sweep the scanner.
+4. The panel solos & renders the layer, runs Depth-Anything, imports the depth map(s) as `<layer> depth`, and applies the rig. Animate `DS · Scan Position` to sweep the scanner — or just set `DS · Sweep Loop (sec)` to e.g. `3` for an automatic looping sweep, no keyframes needed.
 
 > AE's UI is frozen while the model runs (a blocking call). A still on CPU is seconds; a long range on CPU can take minutes — use a GPU build of torch for video.
 
@@ -58,6 +58,7 @@ One tidy **Effect Controls** group of `DS ·` controls:
 | `DS · DoF Amount` | Compound Blur | Depth-based shallow depth-of-field |
 | `DS · Color Map` | Colorama | Colorful depth visualization (0 = off, 100 = full) |
 | `DS · Scan Position` | Threshold sweep | Depth the scan plane sits at — **animate this** |
+| `DS · Sweep Loop (sec)` | Expression | Auto-loops the scan 0→100 every N seconds (0 = manual) |
 | `DS · Scan Width` | Box Blur / Glow | Thickness / softness of the scan line |
 | `DS · Scan Color` | Tint | Color of the glowing scan front |
 | `DS · Scan Glow` | Glow / Opacity | Brightness of the sweeping contour |

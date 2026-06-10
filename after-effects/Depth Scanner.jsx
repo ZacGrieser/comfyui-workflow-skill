@@ -170,8 +170,16 @@
             trySet(dof.property("ADBE Slider Control-0001"), 0);
             var colMap = addControl(sceneLayer, "ADBE Slider Control", "DS · Color Map");
             trySet(colMap.property("ADBE Slider Control-0001"), 0);
+            var sweep = addControl(sceneLayer, "ADBE Slider Control", "DS · Sweep Loop (sec)");
+            trySet(sweep.property("ADBE Slider Control-0001"), 0); // 0 = manual
+
             var scanPos = addControl(sceneLayer, "ADBE Slider Control", "DS · Scan Position");
             trySet(scanPos.property("ADBE Slider Control-0001"), 50);
+            // Auto-sweep: when Sweep Loop > 0, the scan position loops 0→100
+            // every N seconds; at 0 the slider is fully manual/keyframable.
+            tryExpr(scanPos.property("ADBE Slider Control-0001"),
+                'var d = effect("DS · Sweep Loop (sec)")("Slider");' +
+                '\nd > 0 ? (time % d) / d * 100 : value;');
             var scanW = addControl(sceneLayer, "ADBE Slider Control", "DS · Scan Width");
             trySet(scanW.property("ADBE Slider Control-0001"), 4);
             var scanColor = addControl(sceneLayer, "ADBE Color Control", "DS · Scan Color");
