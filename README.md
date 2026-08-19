@@ -45,7 +45,7 @@ https://github.com/user-attachments/assets/5420d74e-18eb-4a72-8819-3138d7353edf
 
 ## 功能特性
 
-- **34 个内置模板** — 覆盖所有主流模型和任务类型
+- **35 个内置模板** — 覆盖所有主流模型和任务类型
 - **360+ 节点定义** — 从 ComfyUI 源码提取，确保字段类型和范围准确
 - **自动模型下载** — 工作流包含原生 `models` 字段，导入时 ComfyUI 自动检测缺失模型并弹窗下载
 - **LLM 集成** — 支持 comfyui_LLM_party 节点 (OpenAI / Claude / Gemini / Ollama / DeepSeek)
@@ -123,6 +123,7 @@ rm -rf ~/.claude/skills/comfyui-workflow
 
 - [`flux-txt2img-wan22-img2vid.json`](flux-txt2img-wan22-img2vid.json) — **FLUX 文生图 → Wan2.2 图生视频** 全流程工作流
 - [`wan22-motion-transfer.json`](wan22-motion-transfer.json) — **Wan2.2 动作迁移** 工作流（参考视频动作 → 生成新视频）
+- [`templates/cinematic-photoreal-video.json`](templates/cinematic-photoreal-video.json) — **写实电影感视频**：FLUX 生成电影级关键帧 → Wan2.2 图生视频（高噪/低噪双专家）→ 5 秒 720p 成片。配方说明见 [`references/cinematic-photoreal.md`](references/cinematic-photoreal.md)
 
 ## 可选：安装 LLM 集成
 
@@ -136,7 +137,7 @@ pip install -r comfyui_LLM_party/requirements.txt
 
 支持的 LLM 提供商：OpenAI、Claude、Gemini、DeepSeek、Ollama 及任何 OpenAI 兼容 API。
 
-## 支持的模板 (34)
+## 支持的模板 (35)
 
 ### 文生图 / 图生图
 
@@ -173,6 +174,7 @@ pip install -r comfyui_LLM_party/requirements.txt
 | Mochi 文生视频 | `mochi-txt2vid.json` | 848x480 |
 | Cosmos 文生视频 | `cosmos-txt2vid.json` | 1280x704 |
 | Cosmos 图生视频 | `cosmos-img2vid.json` | Cosmos img2vid |
+| 写实电影感视频 | `cinematic-photoreal-video.json` | FLUX 关键帧 → Wan2.2 图生视频双专家，1280x720 / 81 帧 |
 
 ### 音频 / 3D / 特殊
 
@@ -223,11 +225,13 @@ comfyui-workflow-skill/
 │   ├── nodes/                            # 42 个节点分类文件 + 索引
 │   ├── node-registry-additions.md        # 附加节点定义 (音频、3D 等)
 │   ├── workflow-format.md                # JSON 格式规范
+│   ├── cinematic-photoreal.md            # 写实电影感视频配方
 │   └── common-workflows.md               # 常见模式
-└── templates/                            # 34 个工作流模板
+└── templates/                            # 35 个工作流模板
     ├── sd15-txt2img.json
     ├── flux-txt2img.json
     ├── wan22-img2vid.json
+    ├── cinematic-photoreal-video.json
     ├── ... (30 个核心模板)
     └── comfyui_LLM_party/                # 4 个 LLM 集成模板
 ```

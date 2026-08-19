@@ -10,10 +10,11 @@ Trigger when the user asks to:
 - Create/generate a ComfyUI workflow
 - Make an image generation workflow
 - Build a video generation pipeline
+- Produce a photorealistic / cinematic / film-look video
 - Set up txt2img, img2img, img2vid, txt2vid workflows
 - Generate a ComfyUI JSON file
 
-Trigger keywords: comfyui, workflow, 工作流, 文生图, 图生图, 文生视频, 图生视频, txt2img, img2img, txt2vid, img2vid, upscale, 放大, inpaint, 重绘, controlnet, lora, sd3, flux, ltxv, mochi, cosmos, stable audio, 音频生成, hunyuan3d, 3d生成, stable cascade, 图生3d
+Trigger keywords: comfyui, workflow, 工作流, 文生图, 图生图, 文生视频, 图生视频, txt2img, img2img, txt2vid, img2vid, upscale, 放大, inpaint, 重绘, controlnet, lora, sd3, flux, ltxv, mochi, cosmos, stable audio, 音频生成, hunyuan3d, 3d生成, stable cascade, 图生3d, cinematic, photorealistic, 电影感, 写实, 影视级, film look
 
 ## Instructions
 
@@ -200,6 +201,26 @@ mini_party(input="a cat", prompt="Enhance this into a detailed image prompt") �
 CLIPTextEncode_party(enhanced_prompt) → CONDITIONING → KSampler → image
 ```
 
+### Photorealistic / Cinematic Requests
+
+When the user asks for a **photorealistic, cinematic, film-look, 电影感 or 影视级** video,
+start from `templates/cinematic-photoreal-video.json` and read
+`references/cinematic-photoreal.md` before tuning anything. Key defaults:
+
+- Generate a **cinematic keyframe first** (FLUX.1-dev at 1280x720, guidance 2.5), then
+  animate it with **Wan 2.2 I2V 14B** using both the high-noise and low-noise experts —
+  do not ask a video model to invent photorealism from text alone
+- Feed the keyframe to **both** `WanImageToVideo.start_image` and `CLIPVisionEncode`
+  (crop `none`) so identity and framing hold across the clip
+- Keyframe prompt = camera report (format → subject → environment → lighting → camera
+  and film stock → skin imperfection → grade); motion prompt = **one** camera move plus
+  secondary motion, never a sequence of events
+- Negative prompt must target the CGI look: `plastic skin, waxy skin, airbrushed,
+  3d render, cgi, oversaturated, morphing, flickering, jittery motion, abrupt cut`
+- 81 frames at **16 fps** (Wan 2.2 14B native) = 5 s; `length` must be `4n+1`
+- Both KSamplerAdvanced passes share one seed; pass 1 ends with
+  `return_with_leftover_noise: enable`, pass 2 uses `add_noise: disable`
+
 ### Node Reference
 
 **IMPORTANT: Do NOT read the entire node registry at once. Read only the category you need.**
@@ -218,6 +239,7 @@ CLIPTextEncode_party(enhanced_prompt) → CONDITIONING → KSampler → image
 3. Also available:
    - `references/workflow-format.md` — JSON format specification
    - `references/common-workflows.md` — common workflow patterns and best practices
+   - `references/cinematic-photoreal.md` — photorealistic / cinematic video recipe (prompt formulas, parameter table, failure fixes)
 
 ### Available Templates
 
@@ -270,6 +292,7 @@ CLIPTextEncode_party(enhanced_prompt) → CONDITIONING → KSampler → image
 | Mochi Text to Video | `templates/mochi-txt2vid.json` | Mochi text-to-video (848x480, 25 frames) |
 | Cosmos Text to Video | `templates/cosmos-txt2vid.json` | Cosmos text-to-video (1280x704, 121 frames) |
 | Cosmos Image to Video | `templates/cosmos-img2vid.json` | Cosmos image-to-video with start frame |
+| Cinematic Photoreal Video | `templates/cinematic-photoreal-video.json` | FLUX keyframe → Wan 2.2 I2V 14B (dual expert), 1280x720 / 81f, film-look prompting |
 
 #### Upscale
 | Template | File | Description |

@@ -1,0 +1,2363 @@
+{
+  "id": "8f2c1d64-5a7b-4e3f-9c10-cinematic0001",
+  "revision": 0,
+  "last_node_id": 29,
+  "last_link_id": 36,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "UNETLoader",
+      "pos": [
+        40,
+        140
+      ],
+      "size": [
+        360,
+        82
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "unet_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "unet_name"
+          },
+          "link": null,
+          "label": "unet_name",
+          "localized_name": "unet_name"
+        },
+        {
+          "name": "weight_dtype",
+          "type": "COMBO",
+          "widget": {
+            "name": "weight_dtype"
+          },
+          "link": null,
+          "label": "weight_dtype",
+          "localized_name": "weight_dtype"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            1,
+            2
+          ],
+          "slot_index": 0,
+          "label": "MODEL",
+          "localized_name": "MODEL"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader"
+      },
+      "title": "Load FLUX.1-dev",
+      "widgets_values": [
+        "flux1-dev.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "DualCLIPLoader",
+      "pos": [
+        40,
+        270
+      ],
+      "size": [
+        360,
+        106
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip_name1",
+          "type": "COMBO",
+          "widget": {
+            "name": "clip_name1"
+          },
+          "link": null,
+          "label": "clip_name1",
+          "localized_name": "clip_name1"
+        },
+        {
+          "name": "clip_name2",
+          "type": "COMBO",
+          "widget": {
+            "name": "clip_name2"
+          },
+          "link": null,
+          "label": "clip_name2",
+          "localized_name": "clip_name2"
+        },
+        {
+          "name": "type",
+          "type": "COMBO",
+          "widget": {
+            "name": "type"
+          },
+          "link": null,
+          "label": "type",
+          "localized_name": "type"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            3
+          ],
+          "slot_index": 0,
+          "label": "CLIP",
+          "localized_name": "CLIP"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "DualCLIPLoader"
+      },
+      "title": "Load FLUX Text Encoders",
+      "widgets_values": [
+        "clip_l.safetensors",
+        "t5xxl_fp16.safetensors",
+        "flux"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "VAELoader",
+      "pos": [
+        40,
+        420
+      ],
+      "size": [
+        360,
+        58
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "vae_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "vae_name"
+          },
+          "link": null,
+          "label": "vae_name",
+          "localized_name": "vae_name"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            11
+          ],
+          "slot_index": 0,
+          "label": "VAE",
+          "localized_name": "VAE"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader"
+      },
+      "title": "Load FLUX VAE",
+      "widgets_values": [
+        "ae.safetensors"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "CLIPTextEncodeFlux",
+      "pos": [
+        440,
+        140
+      ],
+      "size": [
+        440,
+        400
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 3,
+          "label": "clip",
+          "localized_name": "clip"
+        },
+        {
+          "name": "clip_l",
+          "type": "STRING",
+          "widget": {
+            "name": "clip_l"
+          },
+          "link": null,
+          "label": "clip_l",
+          "localized_name": "clip_l"
+        },
+        {
+          "name": "t5xxl",
+          "type": "STRING",
+          "widget": {
+            "name": "t5xxl"
+          },
+          "link": null,
+          "label": "t5xxl",
+          "localized_name": "t5xxl"
+        },
+        {
+          "name": "guidance",
+          "type": "FLOAT",
+          "widget": {
+            "name": "guidance"
+          },
+          "link": null,
+          "label": "guidance",
+          "localized_name": "guidance"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            4
+          ],
+          "slot_index": 0,
+          "label": "CONDITIONING",
+          "localized_name": "CONDITIONING"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncodeFlux"
+      },
+      "title": "Shot Description (keyframe prompt)",
+      "widgets_values": [
+        "cinematic film still, anamorphic 35mm, shallow depth of field, natural skin texture, practical lighting",
+        "Cinematic film still from a contemporary drama. A woman in her early thirties stands on a rain-soaked city street at blue hour, three-quarter view, weight on one hip, looking off-camera past the lens. She wears a charcoal wool overcoat over a cream knit; damp hair falls loose across her cheek. Wet asphalt mirrors the amber sodium streetlamps and the cold cyan of a shop window behind her; thin volumetric haze separates her from the background. Motivated key light from the left at 45 degrees, soft falloff, deep unlifted shadows with detail retained in the coat. Photographed on Kodak Vision3 500T with a 40mm anamorphic lens at T2.0, shot on Arri Alexa, shallow depth of field with an oval bokeh, gentle halation on the highlights, fine organic film grain. Natural unretouched skin with visible pores, faint flyaway hairs, a real human face with asymmetry. Muted teal-and-amber grade, filmic contrast curve, no digital oversharpening.",
+        2.5
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 5,
+      "type": "EmptyLatentImage",
+      "pos": [
+        440,
+        590
+      ],
+      "size": [
+        300,
+        106
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "widget": {
+            "name": "width"
+          },
+          "link": null,
+          "label": "width",
+          "localized_name": "width"
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "widget": {
+            "name": "height"
+          },
+          "link": null,
+          "label": "height",
+          "localized_name": "height"
+        },
+        {
+          "name": "batch_size",
+          "type": "INT",
+          "widget": {
+            "name": "batch_size"
+          },
+          "link": null,
+          "label": "batch_size",
+          "localized_name": "batch_size"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            9
+          ],
+          "slot_index": 0,
+          "label": "LATENT",
+          "localized_name": "LATENT"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EmptyLatentImage"
+      },
+      "title": "Frame Size 1280x720 (16:9)",
+      "widgets_values": [
+        1280,
+        720,
+        1
+      ]
+    },
+    {
+      "id": 6,
+      "type": "KSamplerSelect",
+      "pos": [
+        940,
+        140
+      ],
+      "size": [
+        280,
+        58
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "sampler_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "sampler_name"
+          },
+          "link": null,
+          "label": "sampler_name",
+          "localized_name": "sampler_name"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SAMPLER",
+          "type": "SAMPLER",
+          "links": [
+            7
+          ],
+          "slot_index": 0,
+          "label": "SAMPLER",
+          "localized_name": "SAMPLER"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSamplerSelect"
+      },
+      "widgets_values": [
+        "euler"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "BasicScheduler",
+      "pos": [
+        940,
+        250
+      ],
+      "size": [
+        280,
+        106
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 2,
+          "label": "model",
+          "localized_name": "model"
+        },
+        {
+          "name": "scheduler",
+          "type": "COMBO",
+          "widget": {
+            "name": "scheduler"
+          },
+          "link": null,
+          "label": "scheduler",
+          "localized_name": "scheduler"
+        },
+        {
+          "name": "steps",
+          "type": "INT",
+          "widget": {
+            "name": "steps"
+          },
+          "link": null,
+          "label": "steps",
+          "localized_name": "steps"
+        },
+        {
+          "name": "denoise",
+          "type": "FLOAT",
+          "widget": {
+            "name": "denoise"
+          },
+          "link": null,
+          "label": "denoise",
+          "localized_name": "denoise"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SIGMAS",
+          "type": "SIGMAS",
+          "links": [
+            8
+          ],
+          "slot_index": 0,
+          "label": "SIGMAS",
+          "localized_name": "SIGMAS"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "BasicScheduler"
+      },
+      "widgets_values": [
+        "simple",
+        28,
+        1.0
+      ]
+    },
+    {
+      "id": 8,
+      "type": "RandomNoise",
+      "pos": [
+        940,
+        410
+      ],
+      "size": [
+        280,
+        82
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise_seed",
+          "type": "INT",
+          "widget": {
+            "name": "noise_seed"
+          },
+          "link": null,
+          "label": "noise_seed",
+          "localized_name": "noise_seed"
+        },
+        {
+          "name": "control_after_generate",
+          "type": "COMBO",
+          "widget": {
+            "name": "control_after_generate"
+          },
+          "link": null,
+          "label": "control_after_generate",
+          "localized_name": "control_after_generate"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "NOISE",
+          "type": "NOISE",
+          "links": [
+            5
+          ],
+          "slot_index": 0,
+          "label": "NOISE",
+          "localized_name": "NOISE"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "RandomNoise"
+      },
+      "widgets_values": [
+        0,
+        "randomize"
+      ]
+    },
+    {
+      "id": 9,
+      "type": "BasicGuider",
+      "pos": [
+        940,
+        540
+      ],
+      "size": [
+        280,
+        72
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1,
+          "label": "model",
+          "localized_name": "model"
+        },
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 4,
+          "label": "conditioning",
+          "localized_name": "conditioning"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "GUIDER",
+          "type": "GUIDER",
+          "links": [
+            6
+          ],
+          "slot_index": 0,
+          "label": "GUIDER",
+          "localized_name": "GUIDER"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "BasicGuider"
+      }
+    },
+    {
+      "id": 10,
+      "type": "SamplerCustomAdvanced",
+      "pos": [
+        1280,
+        140
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise",
+          "type": "NOISE",
+          "link": 5,
+          "label": "noise",
+          "localized_name": "noise"
+        },
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "link": 6,
+          "label": "guider",
+          "localized_name": "guider"
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 7,
+          "label": "sampler",
+          "localized_name": "sampler"
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 8,
+          "label": "sigmas",
+          "localized_name": "sigmas"
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 9,
+          "label": "latent_image",
+          "localized_name": "latent_image"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": [
+            10
+          ],
+          "slot_index": 0,
+          "label": "output",
+          "localized_name": "output"
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": null,
+          "slot_index": 1,
+          "label": "denoised_output",
+          "localized_name": "denoised_output"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SamplerCustomAdvanced"
+      }
+    },
+    {
+      "id": 11,
+      "type": "VAEDecode",
+      "pos": [
+        1280,
+        320
+      ],
+      "size": [
+        300,
+        58
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 10,
+          "label": "samples",
+          "localized_name": "samples"
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 11,
+          "label": "vae",
+          "localized_name": "vae"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            12,
+            18,
+            23
+          ],
+          "slot_index": 0,
+          "label": "IMAGE",
+          "localized_name": "IMAGE"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "title": "Decode Keyframe"
+    },
+    {
+      "id": 12,
+      "type": "SaveImage",
+      "pos": [
+        1280,
+        430
+      ],
+      "size": [
+        420,
+        420
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 12,
+          "label": "images",
+          "localized_name": "images"
+        },
+        {
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null,
+          "label": "filename_prefix",
+          "localized_name": "filename_prefix"
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "title": "Save Keyframe (still)",
+      "widgets_values": [
+        "cinematic/keyframe"
+      ]
+    },
+    {
+      "id": 13,
+      "type": "UNETLoader",
+      "pos": [
+        40,
+        1020
+      ],
+      "size": [
+        400,
+        82
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "unet_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "unet_name"
+          },
+          "link": null,
+          "label": "unet_name",
+          "localized_name": "unet_name"
+        },
+        {
+          "name": "weight_dtype",
+          "type": "COMBO",
+          "widget": {
+            "name": "weight_dtype"
+          },
+          "link": null,
+          "label": "weight_dtype",
+          "localized_name": "weight_dtype"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            13
+          ],
+          "slot_index": 0,
+          "label": "MODEL",
+          "localized_name": "MODEL"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader"
+      },
+      "title": "Wan 2.2 I2V — High Noise Expert",
+      "widgets_values": [
+        "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 14,
+      "type": "UNETLoader",
+      "pos": [
+        40,
+        1150
+      ],
+      "size": [
+        400,
+        82
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "unet_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "unet_name"
+          },
+          "link": null,
+          "label": "unet_name",
+          "localized_name": "unet_name"
+        },
+        {
+          "name": "weight_dtype",
+          "type": "COMBO",
+          "widget": {
+            "name": "weight_dtype"
+          },
+          "link": null,
+          "label": "weight_dtype",
+          "localized_name": "weight_dtype"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            14
+          ],
+          "slot_index": 0,
+          "label": "MODEL",
+          "localized_name": "MODEL"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader"
+      },
+      "title": "Wan 2.2 I2V — Low Noise Expert",
+      "widgets_values": [
+        "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 15,
+      "type": "CLIPLoader",
+      "pos": [
+        40,
+        1290
+      ],
+      "size": [
+        400,
+        106
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "clip_name"
+          },
+          "link": null,
+          "label": "clip_name",
+          "localized_name": "clip_name"
+        },
+        {
+          "name": "type",
+          "type": "COMBO",
+          "widget": {
+            "name": "type"
+          },
+          "link": null,
+          "label": "type",
+          "localized_name": "type"
+        },
+        {
+          "name": "device",
+          "type": "COMBO",
+          "widget": {
+            "name": "device"
+          },
+          "link": null,
+          "label": "device",
+          "localized_name": "device"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            15,
+            16
+          ],
+          "slot_index": 0,
+          "label": "CLIP",
+          "localized_name": "CLIP"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPLoader"
+      },
+      "title": "Load UMT5 Text Encoder",
+      "widgets_values": [
+        "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+        "wan",
+        "default"
+      ]
+    },
+    {
+      "id": 16,
+      "type": "VAELoader",
+      "pos": [
+        40,
+        1440
+      ],
+      "size": [
+        400,
+        58
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "vae_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "vae_name"
+          },
+          "link": null,
+          "label": "vae_name",
+          "localized_name": "vae_name"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            21,
+            33
+          ],
+          "slot_index": 0,
+          "label": "VAE",
+          "localized_name": "VAE"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader"
+      },
+      "title": "Load Wan VAE",
+      "widgets_values": [
+        "wan_2.1_vae.safetensors"
+      ]
+    },
+    {
+      "id": 17,
+      "type": "CLIPVisionLoader",
+      "pos": [
+        40,
+        1550
+      ],
+      "size": [
+        400,
+        58
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "clip_name"
+          },
+          "link": null,
+          "label": "clip_name",
+          "localized_name": "clip_name"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CLIP_VISION",
+          "type": "CLIP_VISION",
+          "links": [
+            17
+          ],
+          "slot_index": 0,
+          "label": "CLIP_VISION",
+          "localized_name": "CLIP_VISION"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPVisionLoader"
+      },
+      "title": "Load CLIP Vision",
+      "widgets_values": [
+        "clip_vision_h.safetensors"
+      ]
+    },
+    {
+      "id": 18,
+      "type": "CLIPVisionEncode",
+      "pos": [
+        490,
+        1550
+      ],
+      "size": [
+        300,
+        82
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip_vision",
+          "type": "CLIP_VISION",
+          "link": 17,
+          "label": "clip_vision",
+          "localized_name": "clip_vision"
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 18,
+          "label": "image",
+          "localized_name": "image"
+        },
+        {
+          "name": "crop",
+          "type": "COMBO",
+          "widget": {
+            "name": "crop"
+          },
+          "link": null,
+          "label": "crop",
+          "localized_name": "crop"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CLIP_VISION_OUTPUT",
+          "type": "CLIP_VISION_OUTPUT",
+          "links": [
+            22
+          ],
+          "slot_index": 0,
+          "label": "CLIP_VISION_OUTPUT",
+          "localized_name": "CLIP_VISION_OUTPUT"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPVisionEncode"
+      },
+      "title": "Encode Keyframe (identity ref)",
+      "widgets_values": [
+        "none"
+      ]
+    },
+    {
+      "id": 19,
+      "type": "ModelSamplingSD3",
+      "pos": [
+        490,
+        1020
+      ],
+      "size": [
+        300,
+        82
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 13,
+          "label": "model",
+          "localized_name": "model"
+        },
+        {
+          "name": "shift",
+          "type": "FLOAT",
+          "widget": {
+            "name": "shift"
+          },
+          "link": null,
+          "label": "shift",
+          "localized_name": "shift"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            24
+          ],
+          "slot_index": 0,
+          "label": "MODEL",
+          "localized_name": "MODEL"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ModelSamplingSD3"
+      },
+      "title": "Shift (High Noise)",
+      "widgets_values": [
+        8.0
+      ]
+    },
+    {
+      "id": 20,
+      "type": "ModelSamplingSD3",
+      "pos": [
+        490,
+        1150
+      ],
+      "size": [
+        300,
+        82
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 14,
+          "label": "model",
+          "localized_name": "model"
+        },
+        {
+          "name": "shift",
+          "type": "FLOAT",
+          "widget": {
+            "name": "shift"
+          },
+          "link": null,
+          "label": "shift",
+          "localized_name": "shift"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            28
+          ],
+          "slot_index": 0,
+          "label": "MODEL",
+          "localized_name": "MODEL"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ModelSamplingSD3"
+      },
+      "title": "Shift (Low Noise)",
+      "widgets_values": [
+        8.0
+      ]
+    },
+    {
+      "id": 21,
+      "type": "CLIPTextEncode",
+      "pos": [
+        490,
+        1270
+      ],
+      "size": [
+        400,
+        180
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 15,
+          "label": "clip",
+          "localized_name": "clip"
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": null,
+          "label": "text",
+          "localized_name": "text"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            19
+          ],
+          "slot_index": 0,
+          "label": "CONDITIONING",
+          "localized_name": "CONDITIONING"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "title": "Camera & Motion (positive)",
+      "widgets_values": [
+        "Cinematic single continuous take. The camera pushes in slowly on a dolly, barely perceptible, while she breathes and shifts her weight; her coat and hair drift in the light wind, fine rain falls through the streetlight and speckles her shoulders, reflections ripple on the wet asphalt, and she turns her head slightly toward the lens near the end of the shot. Steady handheld micro-movement, consistent lighting and exposure, natural human motion at real-world speed, motion blur consistent with a 180-degree shutter, photorealistic, film grain preserved."
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 22,
+      "type": "CLIPTextEncode",
+      "pos": [
+        490,
+        1480
+      ],
+      "size": [
+        400,
+        150
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 16,
+          "label": "clip",
+          "localized_name": "clip"
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": null,
+          "label": "text",
+          "localized_name": "text"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            20
+          ],
+          "slot_index": 0,
+          "label": "CONDITIONING",
+          "localized_name": "CONDITIONING"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "title": "Anti-CGI (negative)",
+      "widgets_values": [
+        "cartoon, anime, illustration, painting, 3d render, cgi, video game, plastic skin, waxy skin, airbrushed, oversaturated, overexposed, washed out, blurry, low resolution, jpeg artifacts, watermark, text, subtitles, logo, deformed face, distorted hands, extra fingers, extra limbs, morphing, melting, warping, flickering, strobing, jittery motion, sped-up motion, teleporting, abrupt cut, camera shake, zoom whip, static frozen image, duplicated subject, background crowd"
+      ],
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 23,
+      "type": "WanImageToVideo",
+      "pos": [
+        950,
+        1270
+      ],
+      "size": [
+        300,
+        272
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 19,
+          "label": "positive",
+          "localized_name": "positive"
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 20,
+          "label": "negative",
+          "localized_name": "negative"
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 21,
+          "label": "vae",
+          "localized_name": "vae"
+        },
+        {
+          "name": "clip_vision_output",
+          "type": "CLIP_VISION_OUTPUT",
+          "link": 22,
+          "label": "clip_vision_output",
+          "localized_name": "clip_vision_output",
+          "shape": 7
+        },
+        {
+          "name": "start_image",
+          "type": "IMAGE",
+          "link": 23,
+          "label": "start_image",
+          "localized_name": "start_image",
+          "shape": 7
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "widget": {
+            "name": "width"
+          },
+          "link": null,
+          "label": "width",
+          "localized_name": "width"
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "widget": {
+            "name": "height"
+          },
+          "link": null,
+          "label": "height",
+          "localized_name": "height"
+        },
+        {
+          "name": "length",
+          "type": "INT",
+          "widget": {
+            "name": "length"
+          },
+          "link": null,
+          "label": "length",
+          "localized_name": "length"
+        },
+        {
+          "name": "batch_size",
+          "type": "INT",
+          "widget": {
+            "name": "batch_size"
+          },
+          "link": null,
+          "label": "batch_size",
+          "localized_name": "batch_size"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            25,
+            29
+          ],
+          "slot_index": 0,
+          "label": "positive",
+          "localized_name": "positive"
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "links": [
+            26,
+            30
+          ],
+          "slot_index": 1,
+          "label": "negative",
+          "localized_name": "negative"
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "links": [
+            27
+          ],
+          "slot_index": 2,
+          "label": "latent",
+          "localized_name": "latent"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WanImageToVideo"
+      },
+      "title": "Wan Image-to-Video 1280x720 / 81f",
+      "widgets_values": [
+        1280,
+        720,
+        81,
+        1
+      ]
+    },
+    {
+      "id": 24,
+      "type": "KSamplerAdvanced",
+      "pos": [
+        1320,
+        1020
+      ],
+      "size": [
+        320,
+        340
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 24,
+          "label": "model",
+          "localized_name": "model"
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 25,
+          "label": "positive",
+          "localized_name": "positive"
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 26,
+          "label": "negative",
+          "localized_name": "negative"
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 27,
+          "label": "latent_image",
+          "localized_name": "latent_image"
+        },
+        {
+          "name": "add_noise",
+          "type": "COMBO",
+          "widget": {
+            "name": "add_noise"
+          },
+          "link": null,
+          "label": "add_noise",
+          "localized_name": "add_noise"
+        },
+        {
+          "name": "noise_seed",
+          "type": "INT",
+          "widget": {
+            "name": "noise_seed"
+          },
+          "link": null,
+          "label": "noise_seed",
+          "localized_name": "noise_seed"
+        },
+        {
+          "name": "control_after_generate",
+          "type": "COMBO",
+          "widget": {
+            "name": "control_after_generate"
+          },
+          "link": null,
+          "label": "control_after_generate",
+          "localized_name": "control_after_generate"
+        },
+        {
+          "name": "steps",
+          "type": "INT",
+          "widget": {
+            "name": "steps"
+          },
+          "link": null,
+          "label": "steps",
+          "localized_name": "steps"
+        },
+        {
+          "name": "cfg",
+          "type": "FLOAT",
+          "widget": {
+            "name": "cfg"
+          },
+          "link": null,
+          "label": "cfg",
+          "localized_name": "cfg"
+        },
+        {
+          "name": "sampler_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "sampler_name"
+          },
+          "link": null,
+          "label": "sampler_name",
+          "localized_name": "sampler_name"
+        },
+        {
+          "name": "scheduler",
+          "type": "COMBO",
+          "widget": {
+            "name": "scheduler"
+          },
+          "link": null,
+          "label": "scheduler",
+          "localized_name": "scheduler"
+        },
+        {
+          "name": "start_at_step",
+          "type": "INT",
+          "widget": {
+            "name": "start_at_step"
+          },
+          "link": null,
+          "label": "start_at_step",
+          "localized_name": "start_at_step"
+        },
+        {
+          "name": "end_at_step",
+          "type": "INT",
+          "widget": {
+            "name": "end_at_step"
+          },
+          "link": null,
+          "label": "end_at_step",
+          "localized_name": "end_at_step"
+        },
+        {
+          "name": "return_with_leftover_noise",
+          "type": "COMBO",
+          "widget": {
+            "name": "return_with_leftover_noise"
+          },
+          "link": null,
+          "label": "return_with_leftover_noise",
+          "localized_name": "return_with_leftover_noise"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            31
+          ],
+          "slot_index": 0,
+          "label": "LATENT",
+          "localized_name": "LATENT"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSamplerAdvanced"
+      },
+      "title": "Pass 1 — High Noise (steps 0-10)",
+      "widgets_values": [
+        "enable",
+        0,
+        "randomize",
+        20,
+        3.5,
+        "euler",
+        "simple",
+        0,
+        10,
+        "enable"
+      ]
+    },
+    {
+      "id": 25,
+      "type": "KSamplerAdvanced",
+      "pos": [
+        1320,
+        1400
+      ],
+      "size": [
+        320,
+        340
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 28,
+          "label": "model",
+          "localized_name": "model"
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 29,
+          "label": "positive",
+          "localized_name": "positive"
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 30,
+          "label": "negative",
+          "localized_name": "negative"
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 31,
+          "label": "latent_image",
+          "localized_name": "latent_image"
+        },
+        {
+          "name": "add_noise",
+          "type": "COMBO",
+          "widget": {
+            "name": "add_noise"
+          },
+          "link": null,
+          "label": "add_noise",
+          "localized_name": "add_noise"
+        },
+        {
+          "name": "noise_seed",
+          "type": "INT",
+          "widget": {
+            "name": "noise_seed"
+          },
+          "link": null,
+          "label": "noise_seed",
+          "localized_name": "noise_seed"
+        },
+        {
+          "name": "control_after_generate",
+          "type": "COMBO",
+          "widget": {
+            "name": "control_after_generate"
+          },
+          "link": null,
+          "label": "control_after_generate",
+          "localized_name": "control_after_generate"
+        },
+        {
+          "name": "steps",
+          "type": "INT",
+          "widget": {
+            "name": "steps"
+          },
+          "link": null,
+          "label": "steps",
+          "localized_name": "steps"
+        },
+        {
+          "name": "cfg",
+          "type": "FLOAT",
+          "widget": {
+            "name": "cfg"
+          },
+          "link": null,
+          "label": "cfg",
+          "localized_name": "cfg"
+        },
+        {
+          "name": "sampler_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "sampler_name"
+          },
+          "link": null,
+          "label": "sampler_name",
+          "localized_name": "sampler_name"
+        },
+        {
+          "name": "scheduler",
+          "type": "COMBO",
+          "widget": {
+            "name": "scheduler"
+          },
+          "link": null,
+          "label": "scheduler",
+          "localized_name": "scheduler"
+        },
+        {
+          "name": "start_at_step",
+          "type": "INT",
+          "widget": {
+            "name": "start_at_step"
+          },
+          "link": null,
+          "label": "start_at_step",
+          "localized_name": "start_at_step"
+        },
+        {
+          "name": "end_at_step",
+          "type": "INT",
+          "widget": {
+            "name": "end_at_step"
+          },
+          "link": null,
+          "label": "end_at_step",
+          "localized_name": "end_at_step"
+        },
+        {
+          "name": "return_with_leftover_noise",
+          "type": "COMBO",
+          "widget": {
+            "name": "return_with_leftover_noise"
+          },
+          "link": null,
+          "label": "return_with_leftover_noise",
+          "localized_name": "return_with_leftover_noise"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            32
+          ],
+          "slot_index": 0,
+          "label": "LATENT",
+          "localized_name": "LATENT"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSamplerAdvanced"
+      },
+      "title": "Pass 2 — Low Noise (steps 10-20)",
+      "widgets_values": [
+        "disable",
+        0,
+        "randomize",
+        20,
+        3.5,
+        "euler",
+        "simple",
+        10,
+        10000,
+        "disable"
+      ]
+    },
+    {
+      "id": 26,
+      "type": "VAEDecode",
+      "pos": [
+        1720,
+        1020
+      ],
+      "size": [
+        300,
+        58
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 32,
+          "label": "samples",
+          "localized_name": "samples"
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 33,
+          "label": "vae",
+          "localized_name": "vae"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            34
+          ],
+          "slot_index": 0,
+          "label": "IMAGE",
+          "localized_name": "IMAGE"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "title": "Decode Frames"
+    },
+    {
+      "id": 27,
+      "type": "ImageSharpen",
+      "pos": [
+        1720,
+        1130
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 34,
+          "label": "image",
+          "localized_name": "image"
+        },
+        {
+          "name": "sharpen_radius",
+          "type": "INT",
+          "widget": {
+            "name": "sharpen_radius"
+          },
+          "link": null,
+          "label": "sharpen_radius",
+          "localized_name": "sharpen_radius"
+        },
+        {
+          "name": "sigma",
+          "type": "FLOAT",
+          "widget": {
+            "name": "sigma"
+          },
+          "link": null,
+          "label": "sigma",
+          "localized_name": "sigma"
+        },
+        {
+          "name": "alpha",
+          "type": "FLOAT",
+          "widget": {
+            "name": "alpha"
+          },
+          "link": null,
+          "label": "alpha",
+          "localized_name": "alpha"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            35
+          ],
+          "slot_index": 0,
+          "label": "IMAGE",
+          "localized_name": "IMAGE"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageSharpen"
+      },
+      "title": "Lens Crispness (subtle)",
+      "widgets_values": [
+        1,
+        1.0,
+        0.25
+      ]
+    },
+    {
+      "id": 28,
+      "type": "CreateVideo",
+      "pos": [
+        1720,
+        1300
+      ],
+      "size": [
+        300,
+        104
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 35,
+          "label": "images",
+          "localized_name": "images"
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": null,
+          "label": "audio",
+          "localized_name": "audio",
+          "shape": 7
+        },
+        {
+          "name": "fps",
+          "type": "FLOAT",
+          "widget": {
+            "name": "fps"
+          },
+          "link": null,
+          "label": "fps",
+          "localized_name": "fps"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VIDEO",
+          "type": "VIDEO",
+          "links": [
+            36
+          ],
+          "slot_index": 0,
+          "label": "VIDEO",
+          "localized_name": "VIDEO"
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CreateVideo"
+      },
+      "title": "Create Video @ 16 fps (Wan native)",
+      "widgets_values": [
+        16.0
+      ]
+    },
+    {
+      "id": 29,
+      "type": "SaveVideo",
+      "pos": [
+        1720,
+        1450
+      ],
+      "size": [
+        480,
+        520
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 36,
+          "label": "video",
+          "localized_name": "video"
+        },
+        {
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null,
+          "label": "filename_prefix",
+          "localized_name": "filename_prefix"
+        },
+        {
+          "name": "format",
+          "type": "COMBO",
+          "widget": {
+            "name": "format"
+          },
+          "link": null,
+          "label": "format",
+          "localized_name": "format"
+        },
+        {
+          "name": "codec",
+          "type": "COMBO",
+          "widget": {
+            "name": "codec"
+          },
+          "link": null,
+          "label": "codec",
+          "localized_name": "codec"
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "SaveVideo"
+      },
+      "title": "Save Cinematic Clip",
+      "widgets_values": [
+        "video/cinematic_photoreal",
+        "auto",
+        "auto"
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      9,
+      0,
+      "MODEL"
+    ],
+    [
+      2,
+      1,
+      0,
+      7,
+      0,
+      "MODEL"
+    ],
+    [
+      3,
+      2,
+      0,
+      4,
+      0,
+      "CLIP"
+    ],
+    [
+      4,
+      4,
+      0,
+      9,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      5,
+      8,
+      0,
+      10,
+      0,
+      "NOISE"
+    ],
+    [
+      6,
+      9,
+      0,
+      10,
+      1,
+      "GUIDER"
+    ],
+    [
+      7,
+      6,
+      0,
+      10,
+      2,
+      "SAMPLER"
+    ],
+    [
+      8,
+      7,
+      0,
+      10,
+      3,
+      "SIGMAS"
+    ],
+    [
+      9,
+      5,
+      0,
+      10,
+      4,
+      "LATENT"
+    ],
+    [
+      10,
+      10,
+      0,
+      11,
+      0,
+      "LATENT"
+    ],
+    [
+      11,
+      3,
+      0,
+      11,
+      1,
+      "VAE"
+    ],
+    [
+      12,
+      11,
+      0,
+      12,
+      0,
+      "IMAGE"
+    ],
+    [
+      13,
+      13,
+      0,
+      19,
+      0,
+      "MODEL"
+    ],
+    [
+      14,
+      14,
+      0,
+      20,
+      0,
+      "MODEL"
+    ],
+    [
+      15,
+      15,
+      0,
+      21,
+      0,
+      "CLIP"
+    ],
+    [
+      16,
+      15,
+      0,
+      22,
+      0,
+      "CLIP"
+    ],
+    [
+      17,
+      17,
+      0,
+      18,
+      0,
+      "CLIP_VISION"
+    ],
+    [
+      18,
+      11,
+      0,
+      18,
+      1,
+      "IMAGE"
+    ],
+    [
+      19,
+      21,
+      0,
+      23,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      20,
+      22,
+      0,
+      23,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      21,
+      16,
+      0,
+      23,
+      2,
+      "VAE"
+    ],
+    [
+      22,
+      18,
+      0,
+      23,
+      3,
+      "CLIP_VISION_OUTPUT"
+    ],
+    [
+      23,
+      11,
+      0,
+      23,
+      4,
+      "IMAGE"
+    ],
+    [
+      24,
+      19,
+      0,
+      24,
+      0,
+      "MODEL"
+    ],
+    [
+      25,
+      23,
+      0,
+      24,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      26,
+      23,
+      1,
+      24,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      27,
+      23,
+      2,
+      24,
+      3,
+      "LATENT"
+    ],
+    [
+      28,
+      20,
+      0,
+      25,
+      0,
+      "MODEL"
+    ],
+    [
+      29,
+      23,
+      0,
+      25,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      30,
+      23,
+      1,
+      25,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      31,
+      24,
+      0,
+      25,
+      3,
+      "LATENT"
+    ],
+    [
+      32,
+      25,
+      0,
+      26,
+      0,
+      "LATENT"
+    ],
+    [
+      33,
+      16,
+      0,
+      26,
+      1,
+      "VAE"
+    ],
+    [
+      34,
+      26,
+      0,
+      27,
+      0,
+      "IMAGE"
+    ],
+    [
+      35,
+      27,
+      0,
+      28,
+      0,
+      "IMAGE"
+    ],
+    [
+      36,
+      28,
+      0,
+      29,
+      0,
+      "VIDEO"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "1 · Cinematic Keyframe — FLUX.1-dev 1280x720",
+      "bounding": [
+        20,
+        60,
+        1720,
+        820
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "2 · Motion — Wan 2.2 I2V 14B (high + low noise experts)",
+      "bounding": [
+        20,
+        940,
+        2220,
+        1080
+      ],
+      "color": "#88A",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {},
+  "version": 0.4,
+  "models": [
+    {
+      "name": "flux1-dev.safetensors",
+      "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/flux1-dev.safetensors",
+      "directory": "diffusion_models"
+    },
+    {
+      "name": "clip_l.safetensors",
+      "url": "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors",
+      "directory": "text_encoders"
+    },
+    {
+      "name": "t5xxl_fp16.safetensors",
+      "url": "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors",
+      "directory": "text_encoders"
+    },
+    {
+      "name": "ae.safetensors",
+      "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/ae.safetensors",
+      "directory": "vae"
+    },
+    {
+      "name": "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+      "directory": "diffusion_models"
+    },
+    {
+      "name": "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+      "directory": "diffusion_models"
+    },
+    {
+      "name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "directory": "text_encoders"
+    },
+    {
+      "name": "wan_2.1_vae.safetensors",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors",
+      "directory": "vae"
+    },
+    {
+      "name": "clip_vision_h.safetensors",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors",
+      "directory": "clip_vision"
+    }
+  ]
+}
